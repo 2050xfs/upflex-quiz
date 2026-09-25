@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trust Diagnostic — Preview | UpFlex Digital</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --ink: #14181f; --muted: #5d6675; --faint: #8a93a3;
+    --bg: #f3f4f6; --card: #ffffff; --line: #e4e7ec;
+    --navy: #101f38; --gold: #c9971f;
+    --good: #1e7e46; --warn: #b3540c; --bad: #b3261e;
+  }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55; }
+  .preview-banner { background: #3a2b00; color: #ffd766; text-align: center;
+    font-size: 12px; letter-spacing: .08em; padding: 10px 12px; font-weight: 700; }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 0 16px 64px; }
+  .masthead { padding: 20px 0 6px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-weight: 800; letter-spacing: .04em; font-size: 15px; }
+  .brand span { color: var(--gold); }
+  .step-count { font-size: 12px; color: var(--faint); }
+  .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 22px; }
+  .progress > div { height: 100%; background: var(--navy); width: 0%; transition: width .35s ease; border-radius: 99px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 26px 22px; box-shadow: 0 2px 14px rgba(16,31,56,.06); }
+  .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--gold); font-weight: 700; margin: 0 0 10px; }
+  h1, h2 { font-family: Georgia, "Times New Roman", serif; font-weight: 700; line-height: 1.25; margin: 0 0 12px; }
+  h1 { font-size: 30px; } h2 { font-size: 23px; }
+  p.lead { color: var(--muted); font-size: 16px; margin: 0 0 18px; }
+  .opt { display: block; width: 100%; text-align: left; background: #fff;
+    border: 2px solid var(--line); border-radius: 12px; padding: 16px;
+    font-size: 16px; margin: 10px 0; cursor: pointer; color: var(--ink); transition: border-color .15s, background .15s; }
+  .opt:active { transform: scale(.99); }
+  .opt:hover { border-color: var(--navy); }
+  .opt small { display: block; color: var(--faint); font-size: 13px; margin-top: 2px; }
+  .btn { display: block; width: 100%; background: var(--navy); color: #fff; border: none;
+    border-radius: 12px; padding: 17px; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 18px; }
+  .btn:active { transform: scale(.99); opacity: .94; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn-ghost { background: transparent; color: var(--muted); font-weight: 600; font-size: 14px;
+    border: none; padding: 12px; width: 100%; cursor: pointer; }
+  textarea, input[type=text], input[type=tel], input[type=email] {
+    width: 100%; border: 2px solid var(--line); border-radius: 12px; padding: 14px;
+    font-size: 16px; margin: 8px 0; font-family: inherit; color: var(--ink); background: #fff; }
+  textarea { min-height: 110px; resize: vertical; }
+  textarea:focus, input:focus { outline: none; border-color: var(--navy); }
+  label.field { font-size: 14px; font-weight: 600; display: block; margin-top: 6px; }
+  .price-block { background: #faf7ec; border: 1px solid #ead9a8; border-radius: 12px;
+    padding: 16px; font-size: 14.5px; color: var(--ink); margin: 18px 0 6px; }
+  .price-block strong.t { display: block; margin-bottom: 8px; font-size: 15px; }
+  .price-block ul { margin: 8px 0 8px 18px; padding: 0; }
+  .price-block li { margin: 4px 0; }
+  .consent { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 4px;
+    font-size: 14px; color: var(--muted); }
+  .consent input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; accent-color: var(--navy); }
+  .err { color: var(--bad); font-size: 14px; margin-top: 8px; display: none; }
+  .score-ring { width: 150px; height: 150px; margin: 6px auto 10px; display: block; }
+  .band { text-align: center; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: 13px; }
+  .band.critical { color: var(--bad); } .band.leaking { color: var(--warn); } .band.strong { color: var(--good); }
+  .gap { border-left: 4px solid var(--gold); background: #fbf8ef; padding: 12px 14px;
+    border-radius: 0 10px 10px 0; margin: 10px 0; }
+  .gap b { display: block; font-size: 14px; margin-bottom: 2px; }
+  .gap p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .strength { border-left: 4px solid var(--good); background: #f2faf5; padding: 12px 14px;
+    border-radius: 0 10px 10px 0; margin: 10px 0; font-size: 14.5px; color: var(--muted); }
+  .fix-first { background: var(--navy); color: #fff; border-radius: 12px; padding: 16px; margin: 16px 0; }
+  .fix-first b { display: block; font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+    color: #ffd766; margin-bottom: 6px; }
+  .fix-first p { margin: 0; font-size: 15.5px; }
+  .proof-slot { border: 2px dashed var(--line); border-radius: 12px; padding: 18px; text-align: center;
+    color: var(--faint); font-size: 14px; margin: 18px 0; }
+  .skeptic-note { background: #eef2f9; border-radius: 12px; padding: 14px 16px; font-size: 14.5px;
+    color: var(--navy); margin: 14px 0; }
+  .confirm-box { background: #f2faf5; border: 1px solid #bfe3cd; border-radius: 12px; padding: 16px; margin: 14px 0; }
+  .confirm-box li { margin: 6px 0; font-size: 14.5px; }
+  pre.demo { background: #101f38; color: #d7e3f5; border-radius: 12px; padding: 14px;
+    font-size: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  .fineprint { font-size: 12.5px; color: var(--faint); margin-top: 18px; }
+  .back-row { margin-top: 14px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <div class="brand">UPFLEX <span>DIGITAL</span></div>
+    <div class="step-count" id="stepCount"></div>
+  </div>
+  <div class="progress"><div id="bar"></div></div>
+  <div class="card" id="screen"></div>
+  <p class="fineprint">Preview of the UpFlex Trust Diagnostic (quiz-funnel v1). Scoring is deterministic — no AI, no tracking, nothing is sent anywhere.</p>
+</div>
+<script>
+/* PRODUCTION: lead-capture endpoint (Apps Script). Set during backend wiring. */
+const FORM_ENDPOINT = "";
+"use strict";
+/* ============================================================
+   UpFlex Trust Diagnostic — preview build (Phase 3a)
+   Spec: quiz-funnel/quiz_map.json v1.0-draft
+   Scoring: trust_signals_score 0-100 = 70 shared + 30 branch.
+   ============================================================ */
+
+const SHARED = [
+  { id: "q_niche", q: "What kind of business do you run?",
+    sub: "This tailors the diagnosis to your kind of business.",
+    opts: [
+      ["a2", "Home services", "Roofing, remodeling, contracting, trades"],
+      ["a1", "Beauty / wellness", "Salon, medspa, barbershop, spa"],
+      ["a3", "Fitness", "Gym, studio, personal training"],
+      ["a4", "Ecommerce / boutique retail", "Online or physical product shop"],
+      ["a5", "Real estate / mortgage", "Agent, broker, lender, loan officer"],
+      ["general", "Something else", "None of the above"]
+    ]},
+  { id: "q_trust_trauma", q: "Have you hired marketing help before — an agency, a freelancer, or software?",
+    sub: "Be honest. It changes how we talk to you, not your score.",
+    opts: [
+      ["never", "Never", "I've handled it all myself"],
+      ["worked", "Yes — and it worked well", ""],
+      ["disappointing", "Yes — but it was disappointing", ""],
+      ["burned", "Yes — and I feel burned", "Money out, nothing to show"]
+    ]},
+  { id: "q_proof", q: "When a potential customer Googles your business today, what do they find?",
+    pts: { strong: 25, thin: 15, mixed: 8, unknown: 3 },
+    opts: [
+      ["strong", "Strong reviews and accurate listings everywhere", ""],
+      ["thin", "Reviews exist, but they're thin or old", ""],
+      ["mixed", "Mixed — some good, some bad, some wrong info", ""],
+      ["unknown", "Honestly, I don't know", ""]
+    ]},
+  { id: "q_response", q: "What happens when a lead calls after hours or while you're on a job?",
+    pts: { always: 25, same_day: 18, when_we_can: 10, miss: 4 },
+    opts: [
+      ["always", "Someone always answers", ""],
+      ["same_day", "Goes to voicemail — we call back the same day", ""],
+      ["when_we_can", "Voicemail — we call back when we can", ""],
+      ["miss", "We probably miss most of them", ""]
+    ]},
+  { id: "q_followup", q: "After you send a quote or estimate, what happens next?",
+    pts: { until_answer: 20, once_twice: 14, wait: 8, no_system: 4 },
+    opts: [
+      ["until_answer", "We follow up until we get an answer", ""],
+      ["once_twice", "We follow up once or twice", ""],
+      ["wait", "We wait for them to come back", ""],
+      ["no_system", "No system — whoever remembers", ""]
+    ]},
+  { id: "q_open", q: "In your own words: what would change in your business if marketing actually worked?",
+    sub: "A sentence or two is plenty. This one isn't scored — it's for the conversation.",
+    open: true }
+];
+
+const BRANCHES = {
+  a2: { name: "Home services contractor", qs: [
+    { id: "b2_1", q: "In a typical week, how many calls do you think go unanswered?",
+      pts: { almost_none: 10, a_few: 7, several: 3, a_lot: 0 },
+      opts: [["almost_none","Almost none"],["a_few","A few"],["several","Several"],["a_lot","Honestly, a lot"]] },
+    { id: "b2_2", q: "Is your business name, address, and phone number identical everywhere online — Google, Yelp, Facebook, directories?",
+      pts: { verified: 10, mostly: 7, probably_not: 3, no_idea: 0 },
+      opts: [["verified","Yes — verified"],["mostly","Mostly, I think"],["probably_not","Probably not"],["no_idea","No idea"]] },
+    { id: "b2_3", q: "How do you currently get most of your jobs?",
+      pts: { referrals: 10, repeat: 8, google: 5, brokers: 2 },
+      opts: [["referrals","Referrals / word of mouth"],["repeat","Repeat customers"],["google","Google / ads"],["brokers","Lead brokers (Angi, Thumbtack, etc.)"]] },
+    { id: "b2_4", q: "When a new lead comes in, how fast do you usually respond?",
+      pts: { minutes: 10, hour: 7, same_day: 3, next_day: 0 },
+      opts: [["minutes","Within minutes"],["hour","Within the hour"],["same_day","Same day"],["next_day","Next day or later"]] },
+    { id: "b2_5", q: "What's your average job worth?",
+      sub: "This just helps us point you at the right package — it doesn't affect your score.",
+      qualifier: true,
+      opts: [["under_1k","Under $1,000"],["1k_5k","$1,000 – $5,000"],["5k_15k","$5,000 – $15,000"],["over_15k","$15,000+"]] }
+  ]},
+  a1: { name: "Beauty / wellness owner", qs: [
+    { id: "b1_1", q: "How do most clients book with you today?",
+      pts: { online_link: 10, dm_phone: 6, walkin: 3, hassle: 0 },
+      opts: [["online_link","Online booking link"],["dm_phone","DM or phone call"],["walkin","Mostly walk-ins"],["hassle","It's a hassle for them"]] },
+    { id: "b1_2", q: "When did your last Google review come in?",
+      pts: { this_week: 10, this_month: 7, months_ago: 3, cant_remember: 0 },
+      opts: [["this_week","This week"],["this_month","This month"],["months_ago","A few months ago"],["cant_remember","Can't remember"]] },
+    { id: "b1_3", q: "Who handles new inquiries when you're with a client?",
+      pts: { staff: 10, me_between: 6, nobody: 3, miss: 0 },
+      opts: [["staff","Front desk / staff"],["me_between","Me, between appointments"],["nobody","Nobody — they wait"],["miss","We miss them"]] }
+  ]},
+  a3: { name: "Fitness studio operator", qs: [
+    { id: "b3_1", q: "How do you capture interest during a presale or promo?",
+      pts: { landing: 10, dms: 6, paper: 3, no_system: 0 },
+      opts: [["landing","Dedicated page + follow-up"],["dms","Social DMs"],["paper","Paper list or memory"],["no_system","No system"]] },
+    { id: "b3_2", q: "What happens after someone takes a trial or intro offer?",
+      pts: { nurture: 10, staff_fu: 6, hope: 3, nothing: 0 },
+      opts: [["nurture","Automated nurture"],["staff_fu","Staff follows up"],["hope","We hope they come back"],["nothing","Nothing"]] },
+    { id: "b3_3", q: "How do you stand out from the gym down the street?",
+      pts: { community: 10, price: 5, dont: 2, not_sure: 2 },
+      opts: [["community","Community / experience"],["price","Price"],["dont","Honestly, we don't"],["not_sure","Not sure"]] }
+  ]},
+  a4: { name: "Ecommerce / boutique retailer", qs: [
+    { id: "b4_1", q: "When someone abandons a cart or inquiry, what happens?",
+      pts: { automated: 10, personal: 6, nothing: 0 },
+      opts: [["automated","Automated recovery"],["personal","Personal follow-up"],["nothing","Nothing"]] },
+    { id: "b4_2", q: "How much of your marketing depends on you personally?",
+      pts: { little: 10, some: 7, most: 3, all: 0 },
+      opts: [["little","Very little"],["some","Some"],["most","Most"],["all","All of it"]] },
+    { id: "b4_3", q: "Do you have an email or text list you can message anytime?",
+      pts: { active: 10, stale: 5, no: 2, didnt_know: 0 },
+      opts: [["active","Yes — active"],["stale","Yes — but stale"],["no","No"],["didnt_know","Didn't know I needed one"]] }
+  ]},
+  a5: { name: "Real estate / mortgage professional", qs: [
+    { id: "b5_1", q: "When a borrower Googles your name, what shows up?",
+      pts: { polished: 10, dated: 5, not_much: 2, not_sure: 0 },
+      opts: [["polished","Polished profiles + reviews"],["dated","Dated website"],["not_much","Not much"],["not_sure","Not sure"]] },
+    { id: "b5_2", q: "Do you have educational content for early-stage borrowers?",
+      pts: { yes: 10, some: 5, no: 0 },
+      opts: [["yes","Yes"],["some","Some"],["no","No"]] },
+    { id: "b5_3", q: "How do you stay in touch with past clients for referrals?",
+      pts: { system: 10, occasional: 6, never: 3, no_system: 0 },
+      opts: [["system","Regular system"],["occasional","Occasional"],["never","Never — they find me"],["no_system","No system"]] }
+  ]},
+  general: { name: "Business owner", qs: [] }
+};
+
+/* Gap library — spec verbatim, plus build-time copy written to the same rule:
+   name the leak plainly, tie it to revenue, one sentence, no invented stats.
+   null = strong answer, not a gap. */
+const GAPS = {
+  q_proof: {
+    strong: null,
+    thin: "Your reviews exist but they're going stale. Fresh reviews are what buyers check last before calling.",
+    mixed: "Buyers are finding mixed signals — good, bad, and wrong info. Inconsistent listings quietly kill trust.",
+    unknown: "You don't know what buyers see when they Google you. That's the first thing to fix — it's free to check."
+  },
+  q_response: {
+    always: null,
+    same_day: "Same-day callbacks lose to instant answers. Most buyers call the next business on the list within minutes.",
+    when_we_can: "Slow callbacks are silent revenue loss — buyers rarely wait around.",
+    miss: "Missed calls are missed jobs, full stop. This is usually the single biggest leak."
+  },
+  q_followup: {
+    until_answer: null,
+    once_twice: "One or two follow-ups isn't a system. Most jobs are won between touch 3 and 7.",
+    wait: "Waiting for buyers to come back means losing to whoever followed up.",
+    no_system: "No follow-up system means every quote is a coin flip — and the house usually loses."
+  },
+  b2_1: { almost_none: null,
+    a_few: "A few missed calls a week adds up fast at your ticket size.",
+    several: "Several missed calls a week is a five-figure annual leak at contractor ticket sizes.",
+    a_lot: "This is the big one. Unanswered calls at your ticket size are the most expensive leak in the business." },
+  b2_2: { verified: null,
+    mostly: "Close isn't enough — one wrong number on one directory sends buyers to a competitor.",
+    probably_not: "Inconsistent listings make you look unreliable before you've said a word.",
+    no_idea: "Worth a 10-minute check — wrong info online is an invisible trust killer." },
+  b2_3: { referrals: null,
+    repeat: "Repeat customers are gold — but they don't replace a pipeline of new buyers.",
+    google: "Relying on Google and ads works until the spend stops or a competitor outbids you.",
+    brokers: "Lead brokers sell the same lead to your competitors. Owning your pipeline beats renting one." },
+  b2_4: { minutes: null,
+    hour: "Within the hour is decent — within minutes wins.",
+    same_day: "Same-day response loses most head-to-head races for the job.",
+    next_day: "Next-day response means you're usually calling back someone who already booked." },
+  b1_1: { online_link: null,
+    dm_phone: "Booking through DMs and calls works — but only when someone's available. An online link captures buyers at 9pm.",
+    walkin: "Walk-ins are great, but they don't scale. Most buyers decide before they ever visit.",
+    hassle: "If booking feels like a hassle, many buyers won't bother. Easy booking is a trust signal." },
+  b1_2: { this_week: null,
+    this_month: "Your reviews are going quiet. Fresh reviews are what buyers check right before booking.",
+    months_ago: "Reviews from months ago look stale to a buyer comparing you tonight.",
+    cant_remember: "If you can't remember your last review, buyers notice the silence." },
+  b1_3: { staff: null,
+    me_between: "Handling inquiries between appointments means delays — buyers move on fast.",
+    nobody: "Unanswered inquiries while you're with a client are bookings walking out the door.",
+    miss: "Missed inquiries are the most direct leak there is." },
+  b3_1: { landing: null,
+    dms: "DMs work but they don't scale — and they die the moment you're busy.",
+    paper: "Paper lists and memory lose leads. Every single one of them.",
+    no_system: "No capture system means presale interest evaporates." },
+  b3_2: { nurture: null,
+    staff_fu: "Staff follow-up works — until it doesn't. Systems don't have off days.",
+    hope: "Hope isn't a follow-up strategy. Most trials convert between the third and seventh touch.",
+    nothing: "No follow-up after a trial means paying to acquire the same person twice." },
+  b3_3: { community: null,
+    price: "Competing on price is a race to the bottom. Buyers choose the gym that feels like theirs.",
+    dont: "If you can't name what makes you different, neither can your buyers.",
+    not_sure: "Not sure what sets you apart means your buyers aren't sure either." },
+  b4_1: { automated: null,
+    personal: "Personal follow-up is good — but it breaks the moment you're the only one doing it.",
+    nothing: "Abandoned carts with no recovery are money left on the table." },
+  b4_2: { little: null,
+    some: "If some of your marketing depends on you, the business can't grow past your calendar.",
+    most: "Marketing that depends on you personally is a bottleneck with your name on it.",
+    all: "When everything depends on you, nothing scales — and nothing survives a busy week." },
+  b4_3: { active: null,
+    stale: "A stale list is a dead asset. Regular, useful messages bring it back to life.",
+    no: "No list means you're renting your audience from the platforms — every time.",
+    didnt_know: "An email or text list is the one audience you actually own. Worth building." },
+  b5_1: { polished: null,
+    dated: "A dated website makes buyers wonder what else is out of date.",
+    not_much: "If Google shows almost nothing under your name, buyers fill the silence with doubt.",
+    not_sure: "Not knowing what borrowers find when they Google you is a blind spot worth fixing tonight." },
+  b5_2: { yes: null,
+    some: "Some educational content is a start — a real library builds real authority.",
+    no: "No educational content means you're invisible to early-stage borrowers doing their research." },
+  b5_3: { system: null,
+    occasional: "Occasional outreach keeps you vaguely remembered. A system keeps you referred.",
+    never: "'They find me' works until the market shifts — then there's no pipeline.",
+    no_system: "No referral system means your best source of business runs on luck." }
+};
+
+const HEADLINES = {
+  a1: { critical: "Your Instagram looks great. Your Google presence doesn't — and that's where bookings are decided.",
+        leaking: "Clients love you in the chair. Strangers can't tell — yet.",
+        strong: "Your reputation is working. Time to make it work harder." },
+  a2: { critical: "Your buyers can't find a reason to trust you — before you ever pick up the phone.",
+        leaking: "You're winning jobs on reputation — but your online presence is leaking the rest.",
+        strong: "Your trust foundation is solid. Here's how to turn it into a machine." },
+  a3: { critical: "Your energy sells in person. Online, buyers see a commodity.",
+        leaking: "You've got the community. Your funnel doesn't show it.",
+        strong: "Strong community signals. Let's convert the lurkers." },
+  a4: { critical: "Your products deserve better than a leaky funnel.",
+        leaking: "Traffic isn't your problem — capture is.",
+        strong: "Solid foundation. Time to scale what works." },
+  a5: { critical: "Borrowers hand over life savings to people they trust. Your web presence isn't earning it.",
+        leaking: "Referrals trust you. Cold traffic doesn't — yet.",
+        strong: "Your authority is showing. Let's make it undeniable." },
+  general: { critical: "Your buyers are deciding whether to trust you right now — here's what they'd find.",
+        leaking: "Good bones. A few trust leaks to plug.",
+        strong: "Strong trust signals. Here's the next level." }
+};
+
+const WHAT_IT_MEANS = {
+  critical: "Right now, a buyer comparing you tonight finds more reasons to doubt than to call. That's not a marketing problem — it's a trust problem, and it costs you jobs you'd never hear about. The good news: every one of these gaps has a fix, and most of them are unglamorous.",
+  leaking: "You've got the foundation — buyers who reach you tend to trust you. But the ones comparing you online are slipping through specific cracks before they ever call. Plug these leaks and more of the right buyers make it to the phone.",
+  strong: "Your trust signals are doing real work — buyers who find you have reasons to call. The next level is turning that foundation into a system that compounds: more proof, faster response, follow-up that never sleeps."
+};
+const SKEPTIC_PREPEND = "If you've been burned by marketing help before, you're not alone — and this report is built to show its work, not sell you a dream.";
+
+const FIX_FIRST = {
+  q_response: "Fix missed and slow responses first — every unanswered call or late callback is a job going to whoever picked up.",
+  q_followup: "Fix follow-up first — build one simple system so every quote gets followed up until there's an answer.",
+  q_proof: "Fix what buyers find when they Google you first — claim and correct every listing, then ask happy customers for fresh reviews this week."
+};
+
+/* Real offer — Notion "Approved Pricing, Packages & Validation Guide" v3.0
+   (Source of Truth: YES, effective 2026-09-15). Verbatim. */
+const OFFER = {
+  packages: [
+    { name: "Core Foundation", setup: "$997", monthly: "$97/month",
+      desc: "Redesigned website + basic lead system." },
+    { name: "Growth Plus", setup: "$2,497", monthly: "$197/month",
+      desc: "Adds local visibility, reviews, and stronger follow-up." },
+    { name: "Complete Growth", setup: "$4,997", monthly: "$297/month",
+      desc: "The complete system, including content and AI support." }
+  ],
+  ads: { name: "Paid Ads (optional)", setup: "+$497", monthly: "+$450/month",
+         desc: "One managed advertising channel. Your ad spend is separate." }
+};
+
+function priceBlockHTML() {
+  const rows = OFFER.packages.map(p =>
+    `<li><strong>${p.name}</strong> — ${p.setup} one-time setup + ${p.monthly}: ${p.desc}</li>`).join("");
+  return `<div class="price-block">
+    <strong class="t">Before you submit — exactly what happens next:</strong>
+    You'll see your full trust report instantly on this page. Then we'll reach out to book your
+    <strong>Digital Growth Review</strong> — a one-time look at your online presence through your buyers'
+    eyes. The review itself has no charge.
+    <ul>${rows}
+    <li><strong>${OFFER.ads.name}</strong> — ${OFFER.ads.setup} setup + ${OFFER.ads.monthly}: ${OFFER.ads.desc}</li></ul>
+    There is <strong>no free trial</strong> — a signed agreement and the setup fee are required before any
+    work begins. No payment is taken on this page.
+  </div>`;
+}
+
+/* ---------------- state + flow ---------------- */
+const state = { answers: {}, step: 0, flow: [] };
+
+function buildFlow() {
+  const f = ["q_niche", "q_trust_trauma", "q_proof", "q_response", "q_followup", "q_open"];
+  const arch = state.answers.q_niche || "general";
+  (BRANCHES[arch].qs || []).forEach(bq => f.push(bq.id));
+  f.push("contact");
+  state.flow = f;
+}
+const BRANCH_LOOKUP = {};
+Object.keys(BRANCHES).forEach(a => (BRANCHES[a].qs || []).forEach(bq => { BRANCH_LOOKUP[bq.id] = bq; }));
+const SHARED_LOOKUP = {};
+SHARED.forEach(s => { SHARED_LOOKUP[s.id] = s; });
+
+function currentId() { return state.flow[state.step]; }
+function totalSteps() { return state.flow.length; }
+
+function setProgress() {
+  const pct = Math.round((state.step / totalSteps()) * 100);
+  document.getElementById("bar").style.width = pct + "%";
+  document.getElementById("stepCount").textContent =
+    state.step < totalSteps() ? ("Step " + (state.step + 1) + " of " + totalSteps()) : "";
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* ---------------- scoring (spec-exact) ---------------- */
+function computeScores() {
+  const A = state.answers;
+  const arch = A.q_niche || "general";
+  const sharedPts = { q_proof: SHARED_LOOKUP.q_proof.pts[A.q_proof],
+                      q_response: SHARED_LOOKUP.q_response.pts[A.q_response],
+                      q_followup: SHARED_LOOKUP.q_followup.pts[A.q_followup] };
+  const shared = sharedPts.q_proof + sharedPts.q_response + sharedPts.q_followup; // max 70
+
+  let branchPoints, branchDetail = [];
+  const bqs = (BRANCHES[arch].qs || []).filter(bq => !bq.qualifier);
+  if (arch === "general") {
+    branchPoints = 15;
+  } else {
+    let sum = 0, max = 0;
+    bqs.forEach(bq => {
+      const p = bq.pts[A[bq.id]] || 0;
+      branchDetail.push({ id: bq.id, pts: p });
+      sum += p; max += 10;
+    });
+    branchPoints = max > 0 ? Math.round(30 * (sum / max)) : 0; // max 30
+  }
+  const total = Math.min(100, shared + branchPoints);
+  const band = total <= 39 ? "critical" : total <= 69 ? "leaking" : "strong";
+  const trauma = (A.q_trust_trauma === "burned" || A.q_trust_trauma === "disappointing") ? "skeptic" : "standard";
+  const offerFit = (arch === "a2" && A.b2_5 === "under_1k") ? "low_ticket_review" : "fit_ok";
+  return { shared, sharedPts, branchPoints, branchDetail, total, band, trauma, arch, offerFit };
+}
+
+function bandLabel(b) { return b === "critical" ? "Critical trust gaps" : b === "leaking" ? "Leaking trust" : "Strong foundation"; }
+
+/* Gap extraction: rank scored answers by points asc; shared outrank branch on ties.
+   Spec deviation (documented): answers scoring a perfect 10 render as "already solid"
+   strengths instead of gaps, so a high scorer never sees a fake "gap". */
+function extractGaps(scores) {
+  const A = state.answers, ranked = [];
+  ["q_proof", "q_response", "q_followup"].forEach(id => {
+    ranked.push({ id, pts: scores.sharedPts[id], shared: true,
+                  copy: (GAPS[id] || {})[A[id]] });
+  });
+  scores.branchDetail.forEach(bd => {
+    ranked.push({ id: bd.id, pts: bd.pts, shared: false,
+                  copy: (GAPS[bd.id] || {})[A[bd.id]] });
+  });
+  ranked.sort((x, y) => x.pts !== y.pts ? x.pts - y.pts : (x.shared === y.shared ? 0 : x.shared ? -1 : 1));
+  const gaps = [], strengths = [];
+  ranked.forEach(r => {
+    if (r.copy) { if (gaps.length < 3) gaps.push(r); }
+    else strengths.push(r);
+  });
+  while (gaps.length < 3 && strengths.length) gaps.push(strengths.shift());
+  return gaps.slice(0, 3);
+}
+
+function questionLabel(id) {
+  if (SHARED_LOOKUP[id]) return SHARED_LOOKUP[id].q;
+  if (BRANCH_LOOKUP[id]) return BRANCH_LOOKUP[id].q;
+  return id;
+}
+function optionLabel(id, val) {
+  const src = SHARED_LOOKUP[id] || BRANCH_LOOKUP[id];
+  if (!src) return val;
+  const o = src.opts.find(x => x[0] === val);
+  return o ? o[1] : val;
+}
+
+/* ---------------- screens ---------------- */
+const screen = () => document.getElementById("screen");
+
+function showIntro() {
+  state.step = 0;
+  screen().innerHTML = `
+    <p class="eyebrow">UpFlex Digital · Trust Diagnostic</p>
+    <h1>Can your buyers trust you before they ever call?</h1>
+    <p class="lead">Answer a few quick questions. You'll get a trust score, your 3 biggest gaps,
+    and the single fix that matters most — built for your kind of business.</p>
+    <p class="lead" style="font-size:14px;">Takes about 2 minutes. Deterministic scoring — no AI guesswork.</p>
+    <button class="btn" id="startBtn">Start the diagnostic</button>`;
+  setProgress();
+  document.getElementById("startBtn").onclick = () => { buildFlow(); state.step = 0; renderStep(); };
+}
+
+function renderStep() {
+  const id = currentId();
+  if (id === "contact") return renderContact();
+  if (id === "q_open") return renderOpen(id);
+  const q = SHARED_LOOKUP[id] || BRANCH_LOOKUP[id];
+  const sub = q.sub ? `<p class="lead" style="font-size:14px;">${esc(q.sub)}</p>` : "";
+  screen().innerHTML = `
+    <p class="eyebrow">Question</p>
+    <h2>${esc(q.q)}</h2>${sub}
+    <div>${q.opts.map(o => `<button class="opt" data-v="${esc(o[0])}">${esc(o[1])}${o[2] ? `<small>${esc(o[2])}</small>` : ""}</button>`).join("")}</div>
+    ${state.step > 0 ? `<div class="back-row"><button class="btn-ghost" id="backBtn">← Back</button></div>` : ""}`;
+  setProgress();
+  screen().querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    state.answers[id] = b.getAttribute("data-v");
+    if (id === "q_niche") buildFlow(); // rebuild now that the branch is known
+    state.step++;
+    renderStep();
+  });
+  const back = document.getElementById("backBtn");
+  if (back) back.onclick = () => { state.step--; renderStep(); };
+}
+
+function renderOpen(id) {
+  const q = SHARED_LOOKUP[id];
+  screen().innerHTML = `
+    <p class="eyebrow">Question</p>
+    <h2>${esc(q.q)}</h2>
+    <p class="lead" style="font-size:14px;">${esc(q.sub)}</p>
+    <textarea id="openText" placeholder="A sentence or two is plenty.">${esc(state.answers[id] || "")}</textarea>
+    <button class="btn" id="openNext">Continue</button>
+    <div class="back-row"><button class="btn-ghost" id="backBtn">← Back</button></div>`;
+  setProgress();
+  document.getElementById("openNext").onclick = () => {
+    state.answers[id] = document.getElementById("openText").value.trim();
+    state.step++; renderStep();
+  };
+  document.getElementById("backBtn").onclick = () => { state.step--; renderStep(); };
+}
+
+function renderContact() {
+  screen().innerHTML = `
+    <p class="eyebrow">Your results are ready</p>
+    <h2>Where should we send your full report?</h2>
+    <p class="lead" style="font-size:14px;">Enter your details to see your trust score and gaps.</p>
+    <label class="field" for="f_name">Full name</label>
+    <input type="text" id="f_name" autocomplete="name" value="${esc(state.answers._name || "")}">
+    <label class="field" for="f_biz">Business name</label>
+    <input type="text" id="f_biz" autocomplete="organization" value="${esc(state.answers._biz || "")}">
+    <label class="field" for="f_phone">Phone</label>
+    <input type="tel" id="f_phone" autocomplete="tel" placeholder="(555) 123-4567" value="${esc(state.answers._phone || "")}">
+    <label class="field" for="f_email">Email</label>
+    <input type="email" id="f_email" autocomplete="email" value="${esc(state.answers._email || "")}">
+    ${priceBlockHTML()}
+    <label class="consent"><input type="checkbox" id="f_consent">
+      <span>I agree UpFlex Digital may contact me about my results by call, text, or email.</span></label>
+    <div class="err" id="cErr">Please complete every field and check the consent box.</div>
+    <button class="btn" id="submitBtn">See my trust score</button>
+    <div class="back-row"><button class="btn-ghost" id="backBtn">← Back</button></div>`;
+  setProgress();
+  document.getElementById("submitBtn").onclick = () => {
+    const v = id2 => document.getElementById(id2).value.trim();
+    const name = v("f_name"), biz = v("f_biz"), phone = v("f_phone"), email = v("f_email");
+    const consent = document.getElementById("f_consent").checked;
+    const emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+    const phoneOk = phone.replace(/\D/g, "").length >= 7;
+    if (!name || !biz || !phoneOk || !emailOk || !consent) {
+      document.getElementById("cErr").style.display = "block";
+      return;
+    }
+    state.answers._name = name; state.answers._biz = biz;
+    state.answers._phone = phone; state.answers._email = email;
+    state.answers._consentAt = new Date().toISOString();
+    renderResult();
+  };
+  document.getElementById("backBtn").onclick = () => { state.step--; renderStep(); };
+}
+
+function renderResult() {
+  const s = computeScores();
+  const A = state.answers;
+  const headline = HEADLINES[s.arch][s.band];
+  const gaps = extractGaps(s);
+  const gapsHTML = gaps.map(g => g.copy
+    ? `<div class="gap"><b>${esc(questionLabel(g.id))}</b><p>${esc(g.copy)}</p></div>`
+    : `<div class="strength"><b>Already solid:</b> ${esc(optionLabel(g.id, A[g.id]))} — keep it up.</div>`).join("");
+
+  // Highest-leverage fix: lowest-scoring shared question (priority: response, followup, proof)
+  const order = ["q_response", "q_followup", "q_proof"];
+  const worst = order.slice().sort((a, b) => s.sharedPts[a] - s.sharedPts[b])[0];
+  const fixText = FIX_FIRST[worst];
+
+  const skeptic = s.trauma === "skeptic"
+    ? `<div class="skeptic-note">${SKEPTIC_PREPEND}</div>` : "";
+  const fitNote = s.offerFit === "low_ticket_review"
+    ? `<div class="skeptic-note"><strong>One honest note:</strong> with average jobs under $1,000, we'll want to make sure the numbers work before recommending a package — that's exactly what the Digital Growth Review is for.</div>` : "";
+
+  const ringColor = s.band === "critical" ? "#b3261e" : s.band === "leaking" ? "#b3540c" : "#1e7e46";
+  const circ = 2 * Math.PI * 64;
+  const dash = (s.total / 100 * circ).toFixed(1);
+
+  screen().innerHTML = `
+    <p class="eyebrow">${esc(BRANCHES[s.arch].name)} · Result</p>
+    <svg class="score-ring" viewBox="0 0 150 150">
+      <circle cx="75" cy="75" r="64" fill="none" stroke="#e4e7ec" stroke-width="12"/>
+      <circle cx="75" cy="75" r="64" fill="none" stroke="${ringColor}" stroke-width="12"
+        stroke-linecap="round" stroke-dasharray="${dash} ${circ}" transform="rotate(-90 75 75)"/>
+      <text x="75" y="72" text-anchor="middle" font-size="34" font-weight="800" fill="#14181f">${s.total}</text>
+      <text x="75" y="94" text-anchor="middle" font-size="13" fill="#8a93a3">/ 100</text>
+    </svg>
+    <p class="band ${s.band}">${bandLabel(s.band)}</p>
+    <h2 style="margin-top:14px;">${esc(headline)}</h2>
+    ${skeptic}
+    <p class="lead" style="font-size:15px;">${esc(WHAT_IT_MEANS[s.band])}</p>
+    ${fitNote}
+    <h2 style="font-size:19px; margin-top:22px;">Your 3 biggest trust gaps</h2>
+    ${gapsHTML}
+    <div class="fix-first"><b>Fix this first</b><p>${esc(fixText)}</p></div>
+    <h2 style="font-size:19px; margin-top:22px;">What working together looks like</h2>
+    <p class="lead" style="font-size:15px;">It starts with a <strong>Digital Growth Review</strong> — we look at your
+    online presence the way your buyers do, then match you to the right package:</p>
+    <div class="price-block" style="margin-top:4px;"><ul style="margin-top:0;">
+      ${OFFER.packages.map(p => `<li><strong>${p.name}</strong> — ${p.setup} setup + ${p.monthly}: ${p.desc}</li>`).join("")}
+      <li><strong>${OFFER.ads.name}</strong> — ${OFFER.ads.setup} setup + ${OFFER.ads.monthly}: ${OFFER.ads.desc}</li>
+    </ul>
+    <span style="font-size:13.5px; color:#5d6675;">No free trial — a signed agreement and the setup fee are required before any work begins.</span></div>
+    <div class="proof-slot">Client results coming soon.<br><span style="font-size:12.5px;">Real proof only — this space stays empty until it's earned.</span></div>
+    <button class="btn" id="ctaBtn">Get my full trust report + fix plan</button>
+    <p class="fineprint">Submitting sends your full report instantly — then we reach out to book your Digital Growth Review.</p>`;
+  document.getElementById("bar").style.width = "100%";
+  document.getElementById("stepCount").textContent = "Done";
+  document.getElementById("ctaBtn").onclick = renderConfirmation;
+}
+
+function renderConfirmation() {
+  const s = computeScores();
+  const A = state.answers;
+  const leadRecord = {
+    quiz_id: "upflex-trust-diagnostic-v1",
+    source: "quiz-funnel-v1",
+    completed_at: new Date().toISOString(),
+    contact: {
+      full_name: A._name, business_name: A._biz, phone: A._phone, email: A._email,
+      marketing_consent: true, consent_captured_at: A._consentAt
+    },
+    scores: {
+      trust_signals_score: s.total, band: s.band, archetype: s.arch,
+      agency_trauma_flag: s.trauma, offer_fit_flag: s.offerFit
+    },
+    answers: Object.assign({}, A, { _name: "[redacted in demo]", _phone: "[redacted in demo]", _email: "[redacted in demo]" })
+  };
+  screen().innerHTML = `
+    <p class="eyebrow">Preview confirmation</p>
+    <h2>You're in. Here's what would happen next.</h2>
+    <div class="confirm-box"><ul style="margin:0; padding-left:18px;">
+      <li><strong>Your lead record is saved</strong> — answers, trust score (${s.total}/100, ${bandLabel(s.band)}), archetype, and consent timestamp.</li>
+      <li><strong>Your full result is emailed instantly</strong> to ${esc(A._email)} — this is where UpFlex eats its own dogfood on speed-to-lead.</li>
+      <li><strong>You're enrolled in follow-up</strong> — day 2 (your #1 fix), day 5 (what buyers check), day 9 (Digital Growth Review invitation).</li>
+      <li><strong>A human reviews your result</strong> and reaches out to book the Digital Growth Review.</li>
+    </ul></div>
+    <p class="lead" style="font-size:14px;"><strong>Demo only:</strong> nothing was actually sent or saved anywhere —
+    this page keeps no data and makes no network calls. In production this is where the CRM record, the instant
+    email, and the nurture queue fire.</p>
+    <p class="eyebrow" style="margin-top:18px;">Demo lead record (as it would be stored)</p>
+    <pre class="demo">${esc(JSON.stringify(leadRecord, null, 2))}</pre>
+    <button class="btn-ghost" id="restartBtn" style="margin-top:16px;">← Retake the diagnostic</button>`;
+  document.getElementById("restartBtn").onclick = () => {
+    state.answers = {}; state.step = 0; showIntro();
+  };
+}
+
+showIntro();
+</script>
+</body>
+</html>
