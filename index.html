@@ -531,6 +531,8 @@ function renderContact() {
     <input type="tel" id="f_phone" autocomplete="tel" placeholder="(555) 123-4567" value="${esc(state.answers._phone || "")}">
     <label class="field" for="f_email">Email</label>
     <input type="email" id="f_email" autocomplete="email" value="${esc(state.answers._email || "")}">
+    <input type="text" id="f_website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"
+      style="position:absolute;left:-9999px;opacity:0;height:1px;width:1px;">
     ${priceBlockHTML()}
     <label class="consent"><input type="checkbox" id="f_consent">
       <span>I agree UpFlex Digital may contact me about my results by call, text, or email.</span></label>
@@ -551,9 +553,40 @@ function renderContact() {
     state.answers._name = name; state.answers._biz = biz;
     state.answers._phone = phone; state.answers._email = email;
     state.answers._consentAt = new Date().toISOString();
+    submitLead();
     renderResult();
   };
   document.getElementById("backBtn").onclick = () => { state.step--; renderStep(); };
+}
+
+/* Fire-and-forget lead submission. Apps Script web apps don't return CORS
+   headers, so we POST with no-cors (opaque response) and never block the
+   user's results on the network. */
+function submitLead() {
+  if (!FORM_ENDPOINT) return;
+  try {
+    const s = computeScores();
+    const A = state.answers;
+    const gaps = extractGaps(s).map(g => ({ label: questionLabel(g.id), copy: g.copy || "" }));
+    const order = ["q_response", "q_followup", "q_proof"];
+    const worst = order.slice().sort((a, b) => s.sharedPts[a] - s.sharedPts[b])[0];
+    const hp = document.getElementById("f_website");
+    const payload = {
+      quiz_id: "upflex-trust-diagnostic-v1",
+      source: "quiz-funnel-v1",
+      name: A._name, business: A._biz, phone: A._phone, email: A._email,
+      consent: true, consentAt: A._consentAt,
+      score: s.total, band: s.band, archetype: s.arch, trauma: s.trauma, offerFit: s.offerFit,
+      gaps: gaps, top_fix: FIX_FIRST[worst],
+      answers: A,
+      website: hp ? hp.value : ""
+    };
+    fetch(FORM_ENDPOINT, {
+      method: "POST", mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    }).catch(() => { state._leadSubmitFailed = true; });
+  } catch (err) { state._leadSubmitFailed = true; }
 }
 
 function renderResult() {
@@ -615,34 +648,18 @@ function renderResult() {
 function renderConfirmation() {
   const s = computeScores();
   const A = state.answers;
-  const leadRecord = {
-    quiz_id: "upflex-trust-diagnostic-v1",
-    source: "quiz-funnel-v1",
-    completed_at: new Date().toISOString(),
-    contact: {
-      full_name: A._name, business_name: A._biz, phone: A._phone, email: A._email,
-      marketing_consent: true, consent_captured_at: A._consentAt
-    },
-    scores: {
-      trust_signals_score: s.total, band: s.band, archetype: s.arch,
-      agency_trauma_flag: s.trauma, offer_fit_flag: s.offerFit
-    },
-    answers: Object.assign({}, A, { _name: "[redacted in demo]", _phone: "[redacted in demo]", _email: "[redacted in demo]" })
-  };
+  const emailed = !state._leadSubmitFailed && !!FORM_ENDPOINT;
   screen().innerHTML = `
-    <p class="eyebrow">Preview confirmation</p>
-    <h2>You're in. Here's what would happen next.</h2>
+    <p class="eyebrow">You're in</p>
+    <h2>Your full report is on its way.</h2>
     <div class="confirm-box"><ul style="margin:0; padding-left:18px;">
       <li><strong>Your lead record is saved</strong> — answers, trust score (${s.total}/100, ${bandLabel(s.band)}), archetype, and consent timestamp.</li>
-      <li><strong>Your full result is emailed instantly</strong> to ${esc(A._email)} — this is where UpFlex eats its own dogfood on speed-to-lead.</li>
-      <li><strong>You're enrolled in follow-up</strong> — day 2 (your #1 fix), day 5 (what buyers check), day 9 (Digital Growth Review invitation).</li>
+      ${emailed
+        ? `<li><strong>Your full result was emailed instantly</strong> to ${esc(A._email)} — check your inbox (and spam, just in case). This is where UpFlex eats its own dogfood on speed-to-lead.</li>`
+        : `<li><strong>Heads up:</strong> the instant email hit a snag — your score is shown above, and we'll still reach out about your Digital Growth Review.</li>`}
+      <li><strong>You're enrolled in follow-up</strong> — day 2 (your #1 fix), day 5 (what buyers check), day 9 (Digital Growth Review invitation). Every email carries a one-click unsubscribe.</li>
       <li><strong>A human reviews your result</strong> and reaches out to book the Digital Growth Review.</li>
     </ul></div>
-    <p class="lead" style="font-size:14px;"><strong>Demo only:</strong> nothing was actually sent or saved anywhere —
-    this page keeps no data and makes no network calls. In production this is where the CRM record, the instant
-    email, and the nurture queue fire.</p>
-    <p class="eyebrow" style="margin-top:18px;">Demo lead record (as it would be stored)</p>
-    <pre class="demo">${esc(JSON.stringify(leadRecord, null, 2))}</pre>
     <button class="btn-ghost" id="restartBtn" style="margin-top:16px;">← Retake the diagnostic</button>`;
   document.getElementById("restartBtn").onclick = () => {
     state.answers = {}; state.step = 0; showIntro();
