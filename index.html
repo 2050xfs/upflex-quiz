@@ -4,80 +4,103 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Trust Diagnostic | UpFlex Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
-    --ink: #14181f; --muted: #5d6675; --faint: #8a93a3;
-    --bg: #f3f4f6; --card: #ffffff; --line: #e4e7ec;
-    --navy: #101f38; --gold: #c9971f;
+    --ink: #293241; --muted: #5d6675; --faint: #8a93a3;
+    --bg: #F7F8FA; --card: #ffffff; --line: #E7ECEF;
+    --coral: #EE6C4D; --burnt: #C1440E; --cyan: #22D3EE;
     --good: #1e7e46; --warn: #b3540c; --bad: #b3261e;
   }
   body { margin: 0; background: var(--bg); color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.55; }
-  .preview-banner { background: #3a2b00; color: #ffd766; text-align: center;
+    line-height: 1.55;
+    background-image: radial-gradient(rgba(41,50,65,.08) 1px, transparent 1.5px);
+    background-size: 32px 32px; }
+  .preview-banner { background: var(--ink); color: var(--cyan); text-align: center;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
     font-size: 12px; letter-spacing: .08em; padding: 10px 12px; font-weight: 700; }
   .wrap { max-width: 620px; margin: 0 auto; padding: 0 16px 64px; }
   .masthead { padding: 20px 0 6px; display: flex; align-items: center; justify-content: space-between; }
-  .brand { font-weight: 800; letter-spacing: .04em; font-size: 15px; }
-  .brand span { color: var(--gold); }
-  .step-count { font-size: 12px; color: var(--faint); }
-  .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 22px; }
-  .progress > div { height: 100%; background: var(--navy); width: 0%; transition: width .35s ease; border-radius: 99px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-    padding: 26px 22px; box-shadow: 0 2px 14px rgba(16,31,56,.06); }
-  .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--gold); font-weight: 700; margin: 0 0 10px; }
-  h1, h2 { font-family: Georgia, "Times New Roman", serif; font-weight: 700; line-height: 1.25; margin: 0 0 12px; }
-  h1 { font-size: 30px; } h2 { font-size: 23px; }
+  .brand { font-family: "Archivo Black", "Arial Black", sans-serif; font-weight: 400;
+    letter-spacing: .02em; font-size: 16px; text-transform: uppercase; }
+  .brand span { color: var(--burnt); }
+  .step-count { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; color: var(--faint); }
+  .progress { height: 10px; background: var(--line); border: 2px solid var(--ink);
+    border-radius: 0; overflow: hidden; margin: 10px 0 22px; }
+  .progress > div { height: 100%; background: var(--coral); width: 0%; transition: width .35s ease; border-radius: 0; }
+  .card { background: var(--card); border: 3px solid var(--ink); border-radius: 0;
+    padding: 26px 22px; box-shadow: 8px 8px 0 0 var(--coral); }
+  .eyebrow { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--burnt); font-weight: 700; margin: 0 0 10px; }
+  h1, h2 { font-family: "Archivo Black", "Arial Black", sans-serif; font-weight: 400;
+    text-transform: uppercase; letter-spacing: -0.01em; line-height: 1.15; margin: 0 0 12px; color: var(--ink); }
+  h1 { font-size: 29px; } h2 { font-size: 21px; }
   p.lead { color: var(--muted); font-size: 16px; margin: 0 0 18px; }
   .opt { display: block; width: 100%; text-align: left; background: #fff;
-    border: 2px solid var(--line); border-radius: 12px; padding: 16px;
-    font-size: 16px; margin: 10px 0; cursor: pointer; color: var(--ink); transition: border-color .15s, background .15s; }
-  .opt:active { transform: scale(.99); }
-  .opt:hover { border-color: var(--navy); }
+    border: 2px solid var(--ink); border-radius: 0; padding: 16px;
+    font-size: 16px; margin: 10px 0; cursor: pointer; color: var(--ink);
+    transition: border-color .15s, box-shadow .15s; }
+  .opt:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 0 var(--cyan); }
+  .opt:hover { border-color: var(--burnt); box-shadow: 4px 4px 0 0 var(--cyan); }
   .opt small { display: block; color: var(--faint); font-size: 13px; margin-top: 2px; }
-  .btn { display: block; width: 100%; background: var(--navy); color: #fff; border: none;
-    border-radius: 12px; padding: 17px; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 18px; }
-  .btn:active { transform: scale(.99); opacity: .94; }
+  .btn { display: block; width: 100%; background: var(--ink); color: #fff; border: none;
+    border-radius: 0; padding: 17px; font-family: "Archivo Black", "Arial Black", sans-serif;
+    font-size: 16px; letter-spacing: .03em; text-transform: uppercase; cursor: pointer;
+    margin-top: 18px; box-shadow: 6px 6px 0 0 var(--coral);
+    transition: transform .1s, box-shadow .1s; }
+  .btn:active { transform: translate(3px,3px); box-shadow: 3px 3px 0 0 var(--coral); opacity: 1; }
   .btn:disabled { opacity: .45; cursor: default; }
-  .btn-ghost { background: transparent; color: var(--muted); font-weight: 600; font-size: 14px;
-    border: none; padding: 12px; width: 100%; cursor: pointer; }
+  .btn-ghost { background: transparent; color: var(--muted); font-weight: 700; font-size: 13px;
+    font-family: "JetBrains Mono", ui-monospace, monospace; text-transform: uppercase;
+    letter-spacing: .06em; border: none; padding: 12px; width: 100%; cursor: pointer; }
   textarea, input[type=text], input[type=tel], input[type=email] {
-    width: 100%; border: 2px solid var(--line); border-radius: 12px; padding: 14px;
+    width: 100%; border: 2px solid var(--ink); border-radius: 0; padding: 14px;
     font-size: 16px; margin: 8px 0; font-family: inherit; color: var(--ink); background: #fff; }
   textarea { min-height: 110px; resize: vertical; }
-  textarea:focus, input:focus { outline: none; border-color: var(--navy); }
-  label.field { font-size: 14px; font-weight: 600; display: block; margin-top: 6px; }
-  .price-block { background: #faf7ec; border: 1px solid #ead9a8; border-radius: 12px;
+  textarea:focus, input:focus { outline: none; border-color: var(--burnt); box-shadow: 3px 3px 0 0 var(--cyan); }
+  label.field { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-top: 6px; }
+  .price-block { background: #fff; border: 2px solid var(--ink); border-radius: 0;
+    box-shadow: 6px 6px 0 0 var(--cyan);
     padding: 16px; font-size: 14.5px; color: var(--ink); margin: 18px 0 6px; }
-  .price-block strong.t { display: block; margin-bottom: 8px; font-size: 15px; }
+  .price-block strong.t { display: block; margin-bottom: 8px; font-size: 15px;
+    font-family: "JetBrains Mono", ui-monospace, monospace; text-transform: uppercase;
+    letter-spacing: .04em; font-size: 13px; }
   .price-block ul { margin: 8px 0 8px 18px; padding: 0; }
   .price-block li { margin: 4px 0; }
   .consent { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 4px;
     font-size: 14px; color: var(--muted); }
-  .consent input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; accent-color: var(--navy); }
+  .consent input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; accent-color: var(--coral); }
   .err { color: var(--bad); font-size: 14px; margin-top: 8px; display: none; }
   .score-ring { width: 150px; height: 150px; margin: 6px auto 10px; display: block; }
-  .band { text-align: center; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: 13px; }
+  .band { text-align: center; font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: 13px; }
   .band.critical { color: var(--bad); } .band.leaking { color: var(--warn); } .band.strong { color: var(--good); }
-  .gap { border-left: 4px solid var(--gold); background: #fbf8ef; padding: 12px 14px;
-    border-radius: 0 10px 10px 0; margin: 10px 0; }
+  .gap { border: 2px solid var(--ink); border-left: 6px solid var(--coral); background: #FDF4EF;
+    border-radius: 0; padding: 12px 14px; margin: 10px 0; }
   .gap b { display: block; font-size: 14px; margin-bottom: 2px; }
   .gap p { margin: 0; font-size: 14.5px; color: var(--muted); }
-  .strength { border-left: 4px solid var(--good); background: #f2faf5; padding: 12px 14px;
-    border-radius: 0 10px 10px 0; margin: 10px 0; font-size: 14.5px; color: var(--muted); }
-  .fix-first { background: var(--navy); color: #fff; border-radius: 12px; padding: 16px; margin: 16px 0; }
-  .fix-first b { display: block; font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
-    color: #ffd766; margin-bottom: 6px; }
+  .strength { border: 2px solid var(--ink); border-left: 6px solid var(--good); background: #f2faf5;
+    border-radius: 0; padding: 12px 14px; margin: 10px 0; font-size: 14.5px; color: var(--muted); }
+  .fix-first { background: var(--ink); color: #fff; border-radius: 0; padding: 18px 16px;
+    margin: 16px 0; box-shadow: 8px 8px 0 0 var(--coral); }
+  .fix-first b { display: block; font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 6px; }
   .fix-first p { margin: 0; font-size: 15.5px; }
-  .proof-slot { border: 2px dashed var(--line); border-radius: 12px; padding: 18px; text-align: center;
+  .proof-slot { border: 2px dashed var(--ink); border-radius: 0; padding: 18px; text-align: center;
     color: var(--faint); font-size: 14px; margin: 18px 0; }
-  .skeptic-note { background: #eef2f9; border-radius: 12px; padding: 14px 16px; font-size: 14.5px;
-    color: var(--navy); margin: 14px 0; }
-  .confirm-box { background: #f2faf5; border: 1px solid #bfe3cd; border-radius: 12px; padding: 16px; margin: 14px 0; }
+  .skeptic-note { background: #EDF0F3; border: 2px solid var(--ink); border-left: 6px solid var(--cyan);
+    border-radius: 0; padding: 14px 16px; font-size: 14.5px; color: var(--ink); margin: 14px 0; }
+  .confirm-box { background: #fff; border: 2px solid var(--ink); border-radius: 0;
+    box-shadow: 6px 6px 0 0 var(--cyan); padding: 16px; margin: 14px 0; }
   .confirm-box li { margin: 6px 0; font-size: 14.5px; }
-  pre.demo { background: #101f38; color: #d7e3f5; border-radius: 12px; padding: 14px;
+  pre.demo { background: #293241; color: #d7e3f5; border-radius: 0; padding: 14px;
     font-size: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
   .fineprint { font-size: 12.5px; color: var(--faint); margin-top: 18px; }
   .back-row { margin-top: 14px; text-align: center; }
@@ -91,7 +114,7 @@
   </div>
   <div class="progress"><div id="bar"></div></div>
   <div class="card" id="screen"></div>
-  <p class="fineprint">Preview of the UpFlex Trust Diagnostic (quiz-funnel v1). Scoring is deterministic — no AI, no tracking, nothing is sent anywhere.</p>
+  <p class="fineprint">UpFlex Trust Diagnostic. Scoring is deterministic — no AI guesswork. Your answers go only to UpFlex Digital so we can deliver your report.</p>
 </div>
 <script>
 /* PRODUCTION: lead-capture endpoint (Apps Script). Set during backend wiring. */
@@ -615,11 +638,11 @@ function renderResult() {
   screen().innerHTML = `
     <p class="eyebrow">${esc(BRANCHES[s.arch].name)} · Result</p>
     <svg class="score-ring" viewBox="0 0 150 150">
-      <circle cx="75" cy="75" r="64" fill="none" stroke="#e4e7ec" stroke-width="12"/>
+      <circle cx="75" cy="75" r="64" fill="none" stroke="#E7ECEF" stroke-width="12"/>
       <circle cx="75" cy="75" r="64" fill="none" stroke="${ringColor}" stroke-width="12"
         stroke-linecap="round" stroke-dasharray="${dash} ${circ}" transform="rotate(-90 75 75)"/>
-      <text x="75" y="72" text-anchor="middle" font-size="34" font-weight="800" fill="#14181f">${s.total}</text>
-      <text x="75" y="94" text-anchor="middle" font-size="13" fill="#8a93a3">/ 100</text>
+      <text x="75" y="72" text-anchor="middle" font-size="34" fill="#293241" font-family="'Archivo Black', sans-serif">${s.total}</text>
+      <text x="75" y="94" text-anchor="middle" font-size="13" fill="#8a93a3" font-family="'JetBrains Mono', monospace">/ 100</text>
     </svg>
     <p class="band ${s.band}">${bandLabel(s.band)}</p>
     <h2 style="margin-top:14px;">${esc(headline)}</h2>
